@@ -99,19 +99,25 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         "*** Our Code Starts Here ***"
 
+
+        # Given a state and an action, we get all of the possible states where it can end up with a probability
+        # associated to each of them: [((4, 1), 0.1), ((6, 1), 0.1), ((5, 2), 0.8)]
+        TransitionStatesAndProbabilities = self.mdp.getTransitionStatesAndProbs(state, action)
+
+
         qValue = 0
 
-        # for every possible outcome of the action
-        for nextState, probability in self.mdp.getTransitionStatesAndProbs(state, action):
 
-            # add reward & future reward (=V) * probability of the outcome
-            reward = self.mdp.getReward(state, action, nextState)
-            qValue += probability * (reward + self.discount * self.values[nextState])
+        for (evaluatedNextState, probability) in TransitionStatesAndProbabilities:
+
+
+            reward = self.mdp.getReward(state, action, evaluatedNextState)
+
+            # Include the reward and the future reward and multiplies it for the probability of that outcome happening
+            qValue += probability * (reward + self.discount * self.values[evaluatedNextState])
 
         return qValue
 
-
-        #util.raiseNotDefined()
 
     def computeActionFromValues(self, state):
         """
@@ -124,17 +130,25 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         "*** Our Code Starts Here ***"
 
-        # get the best possible action for the state
+        # Calculates the best action for a given state using the Q-Value. It is a way of considering all the possible
+        # outcomes for an action.
         policies = util.Counter()
+
+        bestAction = None
+        bestQValue = -999999999
+
+        # Returns the best action depending on its Q-Value
         for action in self.mdp.getPossibleActions(state):
 
-            # how good is an action = q-value (which considers all possible outcomes)
+
             policies[action] = self.getQValue(state, action)
 
-        # return the best action, e.g. 'north'
-        return policies.argMax()
+            if bestQValue < policies[action]:
+                bestAction = action
+                bestQValue = policies[action]
 
-        # util.raiseNotDefined()
+        return bestAction
+
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
