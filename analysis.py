@@ -21,7 +21,11 @@
 
 def question2():
     answerDiscount = 0.9
-    answerNoise = 0.2
+
+    # We simply reduce the answerNoise from 0.2 to 0. That means that the agent always will end up in the intended
+    # positon. Because of that, it will be able to cross the bridge without falling into the low reward positions
+    # at the sides
+    answerNoise = 0
     return answerDiscount, answerNoise
 
 def question3a():
