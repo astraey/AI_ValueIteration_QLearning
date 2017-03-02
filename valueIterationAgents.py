@@ -46,6 +46,35 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
 
+        for i in range(0, self.iterations):
+            newValues = self.values.copy()  # copy the values, doesn't create a reference to them
+
+            # getStates returns a list of all the posible states (x,y) coordinates of the agent
+
+            for state in self.mdp.getStates():  # go through every state
+
+                # If a state is a terminal, we skip the for iteration
+                if self.mdp.isTerminal(state):
+                    continue
+
+                # We get the possible actions given a state and decide whichone has the best value
+
+                bestValue = -999999999
+
+                possibleActionsInState = self.mdp.getPossibleActions(state)
+
+                for action in possibleActionsInState:
+
+                    valueOfAction = self.getQValue(state, action)
+
+                    if valueOfAction > bestValue:
+                        bestValue = valueOfAction
+
+                # Assigns to the State in the list newValues the best Value found for that state.
+                #  {(0, 1): 1.0, (3, 2): -100.0, ...}
+                newValues[state] = bestValue
+
+            self.values = newValues
 
     def getValue(self, state):
         """
@@ -53,26 +82,54 @@ class ValueIterationAgent(ValueEstimationAgent):
         """
         return self.values[state]
 
-
     def computeQValueFromValues(self, state, action):
         """
           Compute the Q-value of action in state from the
           value function stored in self.values.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        "*** Our Code Starts Here ***"
+
+        # Given a state and an action, we get all of the possible states where it can end up with a probability
+        # associated to each of them: [((4, 1), 0.1), ((6, 1), 0.1), ((5, 2), 0.8)]
+        TransitionStatesAndProbabilities = self.mdp.getTransitionStatesAndProbs(state, action)
+
+        qValue = 0
+
+        for (evaluatedNextState, probability) in TransitionStatesAndProbabilities:
+            reward = self.mdp.getReward(state, action, evaluatedNextState)
+
+            # Include the reward and the future reward and multiplies it for the probability of that outcome happening
+            qValue += probability * (reward + self.discount * self.values[evaluatedNextState])
+
+        return qValue
 
     def computeActionFromValues(self, state):
         """
           The policy is the best action in the given state
           according to the values currently stored in self.values.
-
           You may break ties any way you see fit.  Note that if
           there are no legal actions, which is the case at the
           terminal state, you should return None.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        "*** Our Code Starts Here ***"
+
+        # Calculates the best action for a given state using the Q-Value. It is a way of considering all the possible
+        # outcomes for an action.
+        policies = util.Counter()
+
+        bestAction = None
+        bestQValue = -999999999
+
+        # Returns the best action depending on its Q-Value
+        for action in self.mdp.getPossibleActions(state):
+
+            policies[action] = self.getQValue(state, action)
+
+            if bestQValue < policies[action]:
+                bestAction = action
+                bestQValue = policies[action]
+
+        return bestAction
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
