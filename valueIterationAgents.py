@@ -99,7 +99,7 @@ class ValueIterationAgent(ValueEstimationAgent):
             reward = self.mdp.getReward(state, action, evaluatedNextState)
 
             # Include the reward and the future reward and multiplies it for the probability of that outcome happening
-            qValue += probability * (reward + self.discount * self.values[evaluatedNextState])
+            qValue += probability * (reward + self.values[evaluatedNextState] * self.discount)
 
         return qValue
 
@@ -123,11 +123,11 @@ class ValueIterationAgent(ValueEstimationAgent):
         # Returns the best action depending on its Q-Value
         for action in self.mdp.getPossibleActions(state):
 
-            policies[action] = self.getQValue(state, action)
+            QValueForStateAction = self.getQValue(state, action)
 
-            if bestQValue < policies[action]:
+            if bestQValue < QValueForStateAction:
                 bestAction = action
-                bestQValue = policies[action]
+                bestQValue = QValueForStateAction
 
         return bestAction
 
