@@ -1,3 +1,1 @@
-Artificial_Intelligence
-
-Project 3
+Value Iteration and Q-Learning implementation
