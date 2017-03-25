@@ -8,4 +8,4 @@
 python autograder.py -q q1
 ```
 
-<p>Replace q1 for q2 or q3 to select the desired algorithm.</p>
+<p>You can replace q1 for q2 or q3 to select the desired algorithm.</p>
